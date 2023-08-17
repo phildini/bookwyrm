@@ -1,3 +1,4 @@
+setuptools>=65.5
 aiohttp==3.8.5
 bleach==5.0.1
 celery==5.3.1
