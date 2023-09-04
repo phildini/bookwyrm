@@ -3,7 +3,7 @@ aiohttp==3.8.5
 bleach==5.0.1
 celery==5.3.1
 colorthief==0.2.1
-Django==3.2.20
+Django==3.2.21
 django-celery-beat==2.5.0
 django-compressor==4.4
 django-imagekit==4.1.0
