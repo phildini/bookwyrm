@@ -101,7 +101,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-    "file_resubmit",
+    "oauth2_provider",
     "sass_processor",
     "bookwyrm",
     "celery",
