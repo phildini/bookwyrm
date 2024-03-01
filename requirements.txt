@@ -11,13 +11,13 @@ django-model-utils==4.3.1
 django-sass-processor==1.2.2
 django-csp==3.7
 environs==9.5.0
-flower==1.2.0
+flower==2.0.0
 grpcio==1.57.0
 libsass==0.22.0
 Markdown==3.4.1
 Pillow==10.2.0
 psycopg2==2.9.7
-pycryptodome==3.18.0
+pycryptodome==3.19.1
 python-dateutil==2.8.2
 redis==4.5.4
 requests==2.31.0
@@ -57,6 +57,3 @@ types-Pillow==10.0.0.3
 types-psycopg2==2.9.21.11
 types-python-dateutil==2.8.19.14
 types-requests==2.31.0.2
-types-requests==2.31.0.2
-opentelemetry-instrumentation>=0.41b0 # not directly required, pinned by Snyk to avoid a vulnerability
-setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
