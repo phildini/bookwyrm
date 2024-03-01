@@ -12,6 +12,9 @@ django-sass-processor==1.2.2
 django-csp==3.7
 environs==9.5.0
 flower==2.0.0
+grpcio==1.57.0
+libsass==0.22.0
+Markdown==3.4.1
 Pillow==10.0.1
 psycopg2==2.9.7
 pycryptodome==3.18.0
