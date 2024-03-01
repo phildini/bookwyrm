@@ -3,9 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional, TypedDict, Any, Callable, Union, Iterator
 from urllib.parse import quote_plus
-
-# pylint: disable-next=deprecated-module
-import imghdr  # Deprecated in 3.11 for removal in 3.13; there's no good alternative yet
+import imghdr
 import logging
 import re
 import asyncio
