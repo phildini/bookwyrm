@@ -5,7 +5,7 @@ from typing import Optional, TypedDict, Any, Callable, Union, Iterator
 from urllib.parse import quote_plus
 
 # pylint: disable-next=deprecated-module
-import imghdr  # This module was deprecated in 3.11 to be removed in 3.13, but no good alternative exists yet.
+import imghdr  # Deprecated in 3.11 for removal in 3.13, but there's no good alternative yet.
 import logging
 import re
 import asyncio
