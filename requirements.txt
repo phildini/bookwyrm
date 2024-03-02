@@ -47,7 +47,7 @@ pytest-cov==2.10.1
 pytest-env==0.6.2
 pytest-xdist==2.3.0
 pytidylib==0.3.2
-pylint==2.14.0
+pylint==2.15.0
 mypy==1.5.1
 celery-types==0.18.0
 django-stubs[compatible-mypy]==4.2.4
