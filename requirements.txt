@@ -25,9 +25,9 @@ opentelemetry-instrumentation-celery==0.37b0
 opentelemetry-instrumentation-django==0.37b0
 opentelemetry-instrumentation-psycopg2==0.37b0
 opentelemetry-sdk==1.16.0
-Pillow==10.0.1
+Pillow==10.2.0
 protobuf==3.20.*
-psycopg2==2.9.5
+psycopg2==2.9.7
 pycryptodome==3.19.1
 pyotp==2.8.0
 python-dateutil==2.8.2
@@ -36,24 +36,25 @@ qrcode==7.3.1
 redis==4.5.4
 requests==2.31.0
 responses==0.22.0
-setuptools>=65.5.1 # Not a direct dependency, pinned to get a security fix
-tornado==6.3.3 # Not a direct dependency, pinned to get a security fix
 
 # Dev
 celery-types==0.18.0
 django-stubs[compatible-mypy]==4.2.4
 mypy==1.5.1
 pylint==2.15.0
+pytest-django==4.1.0
 pytest==6.2.5
 pytest-cov==2.10.1
 pytest-django==4.1.0
 pytest-env==0.6.2
 pytest-xdist==2.3.0
 pytidylib==0.3.2
+setuptools>=65.5.1
+tornado==6.3.3
 types-bleach==6.0.0.4
 types-dataclasses==0.6.6
 types-Markdown==3.4.2.10
-types-Pillow==10.0.0.3
+types-Pillow==10.2.0.20240213
 types-psycopg2==2.9.21.11
 types-python-dateutil==2.8.19.14
 types-requests==2.31.0.2
