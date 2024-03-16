@@ -20,7 +20,7 @@ grpcio==1.57.0 # Not a direct dependency, pinned to get a security fix
 libsass==0.22.0
 Markdown==3.4.1
 opentelemetry-api==1.16.0
-opentelemetry-exporter-otlp-proto-grpc==1.23.0
+opentelemetry-exporter-otlp-proto-grpc==1.22.0
 opentelemetry-instrumentation-celery==0.41b0
 opentelemetry-instrumentation-django==0.41b0
 opentelemetry-instrumentation-psycopg2==0.41b0
