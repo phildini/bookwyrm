@@ -24,10 +24,9 @@ libsass==0.22.0
 Markdown==3.4.1
 opentelemetry-api==1.16.0
 opentelemetry-exporter-otlp-proto-grpc==1.16.0
-opentelemetry-instrumentation>=0.41b0 # not directly required, pinned to get a security fix
-opentelemetry-instrumentation-celery==0.37b0
-opentelemetry-instrumentation-django==0.37b0
-opentelemetry-instrumentation-psycopg2==0.37b0
+opentelemetry-instrumentation-celery==0.41b0
+opentelemetry-instrumentation-django==0.41b0
+opentelemetry-instrumentation-psycopg2==0.41b0
 opentelemetry-sdk==1.16.0
 packaging==21.3
 Pillow==10.3.0
