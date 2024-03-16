@@ -24,6 +24,7 @@ libsass==0.22.0
 Markdown==3.4.1
 opentelemetry-api==1.16.0
 opentelemetry-exporter-otlp-proto-grpc==1.16.0
+opentelemetry-instrumentation>=0.41b0 # not directly required, pinned to get a security fix
 opentelemetry-instrumentation-celery==0.37b0
 opentelemetry-instrumentation-django==0.37b0
 opentelemetry-instrumentation-psycopg2==0.37b0
@@ -41,7 +42,6 @@ qrcode==7.3.1
 redis==4.5.4
 requests==2.31.0
 responses==0.22.0
-setuptools>=65.5.1 # Not a direct dependency, pinned to get a security fix
 s3-tar==0.1.13
 tornado==6.3.3 # Not a direct dependency, pinned to get a security fix
 
@@ -58,7 +58,7 @@ pytest-django==4.1.0
 pytest-env==0.6.2
 pytest-xdist==2.3.0
 pytidylib==0.3.2
-sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
+sqlparse>=0.5.0 # Not a direct dependency, pinned to get a security fix
 types-bleach==6.0.0.4
 types-dataclasses==0.6.6
 types-Markdown==3.4.2.10
@@ -66,3 +66,5 @@ types-Pillow==10.2.0.20240311
 types-psycopg2==2.9.21.11
 types-python-dateutil==2.8.19.14
 types-requests==2.31.0.2
+types-requests==2.31.0.2
+setuptools>=65.5.1 # Not a direct dependency, pinned to get a security fix
