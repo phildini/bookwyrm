@@ -119,7 +119,8 @@ services:
     logging: *default-logging
     env_file: .env
     volumes:
-      - .:/app:ro
+      - .:/app
+      - static_volume:/app/static
     networks:
       - main
     depends_on:
