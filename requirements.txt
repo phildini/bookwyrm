@@ -1,4 +1,4 @@
-aiohttp==3.9.2
+aiohttp==3.9.4
 bleach==5.0.1
 boto3==1.26.57
 bw-file-resubmit==0.6.0rc2
@@ -10,13 +10,14 @@ django-compressor==4.4
 django-csp==3.7
 django-imagekit==4.1.0
 django-model-utils==4.3.1
+django-oauth-toolkit==2.3.0
 django-pgtrigger==4.11.0
 django-redis==5.2.0
 django-sass-processor==1.2.2
 django-storages==1.13.2
 django-storages[azure]
 environs==9.5.0
-flower==2.0.0
+flower==2.0.1
 grpcio==1.57.0 # Not a direct dependency, pinned to get a security fix
 libsass==0.22.0
 Markdown==3.4.1
@@ -26,7 +27,8 @@ opentelemetry-instrumentation-celery==0.37b0
 opentelemetry-instrumentation-django==0.37b0
 opentelemetry-instrumentation-psycopg2==0.37b0
 opentelemetry-sdk==1.16.0
-Pillow==10.2.0
+Pillow==10.3.0
+pilkit>=3.0 # dependency of django-imagekit, 2.0 is incompatible with Pillow>=10
 protobuf==3.20.*
 psycopg2==2.9.5
 pycryptodome==3.19.1
@@ -37,10 +39,12 @@ qrcode==7.3.1
 redis==4.5.4
 requests==2.31.0
 responses==0.22.0
+s3-tar==0.1.13
 setuptools>=65.5.1 # Not a direct dependency, pinned to get a security fix
 tornado==6.3.3 # Not a direct dependency, pinned to get a security fix
 
 # Dev
+black==22.*
 celery-types==0.18.0
 django-stubs[compatible-mypy]==4.2.4
 mypy==1.5.1
