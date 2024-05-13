@@ -80,6 +80,10 @@ class Status(OrderedCollectionPageMixin, BookWyrmModel):
         """default sorting"""
 
         ordering = ("-published_date",)
+        indexes = [
+            models.Index(fields=["remote_id"]),
+            models.Index(fields=["thread_id"]),
+        ]
 
     def save(self, *args, **kwargs):
         """save and notify"""
@@ -388,10 +392,10 @@ class Quotation(BookStatus):
     def _format_position(self) -> Optional[str]:
         """serialize page position"""
         beg = self.position
-        end = self.endposition or 0
+        end = self.endposition
         if self.position_mode != "PG" or not beg:
             return None
-        return f"pp. {beg}-{end}" if end > beg else f"p. {beg}"
+        return f"pp. {beg}-{end}" if end else f"p. {beg}"
 
     @property
     def pure_content(self):

@@ -19,7 +19,6 @@ DOMAIN = env("DOMAIN")
 with open("VERSION", encoding="utf-8") as f:
     version = f.read()
     version = version.replace("\n", "")
-f.close()
 
 VERSION = version
 
@@ -102,12 +101,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "oauth2_provider",
     "file_resubmit",
     "sass_processor",
     "bookwyrm",
     "celery",
     "django_celery_beat",
     "imagekit",
+    "pgtrigger",
     "storages",
 ]
 
@@ -350,21 +351,13 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-USER_AGENT = f"BookWyrm (BookWyrm/{VERSION}; +https://{DOMAIN}/)"
-
 # Imagekit generated thumbnails
 ENABLE_THUMBNAIL_GENERATION = env.bool("ENABLE_THUMBNAIL_GENERATION", False)
 IMAGEKIT_CACHEFILE_DIR = "thumbnails"
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "bookwyrm.thumbnail_generation.Strategy"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 CSP_ADDITIONAL_HOSTS = env.list("CSP_ADDITIONAL_HOSTS", [])
-
-# Storage
 
 PROTOCOL = "http"
 if USE_HTTPS:
@@ -372,8 +365,20 @@ if USE_HTTPS:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+PORT = env.int("PORT", 443 if USE_HTTPS else 80)
+if (USE_HTTPS and PORT == 443) or (not USE_HTTPS and PORT == 80):
+    NETLOC = DOMAIN
+else:
+    NETLOC = f"{DOMAIN}:{PORT}"
+BASE_URL = f"{PROTOCOL}://{NETLOC}"
+
+USER_AGENT = f"BookWyrm (BookWyrm/{VERSION}; +{BASE_URL})"
+
+# Storage
+
 USE_S3 = env.bool("USE_S3", False)
 USE_AZURE = env.bool("USE_AZURE", False)
+S3_SIGNED_URL_EXPIRY = env.int("S3_SIGNED_URL_EXPIRY", 900)
 
 if USE_S3:
     # AWS settings
@@ -385,19 +390,34 @@ if USE_S3:
     AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", None)
     AWS_DEFAULT_ACL = "public-read"
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_S3_URL_PROTOCOL = env("AWS_S3_URL_PROTOCOL", f"{PROTOCOL}:")
     # S3 Static settings
     STATIC_LOCATION = "static"
-    STATIC_URL = f"{PROTOCOL}://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    STATIC_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    STATIC_FULL_URL = STATIC_URL
     STATICFILES_STORAGE = "bookwyrm.storage_backends.StaticStorage"
     # S3 Media settings
     MEDIA_LOCATION = "images"
-    MEDIA_URL = f"{PROTOCOL}://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
+    MEDIA_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
     MEDIA_FULL_URL = MEDIA_URL
-    STATIC_FULL_URL = STATIC_URL
     DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.ImagesStorage"
-    CSP_DEFAULT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
-    CSP_SCRIPT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
+    # S3 Exports settings
+    EXPORTS_STORAGE = "bookwyrm.storage_backends.ExportsS3Storage"
+    # Content Security Policy
+    CSP_DEFAULT_SRC = [
+        "'self'",
+        f"{AWS_S3_URL_PROTOCOL}//{AWS_S3_CUSTOM_DOMAIN}"
+        if AWS_S3_CUSTOM_DOMAIN
+        else None,
+    ] + CSP_ADDITIONAL_HOSTS
+    CSP_SCRIPT_SRC = [
+        "'self'",
+        f"{AWS_S3_URL_PROTOCOL}//{AWS_S3_CUSTOM_DOMAIN}"
+        if AWS_S3_CUSTOM_DOMAIN
+        else None,
+    ] + CSP_ADDITIONAL_HOSTS
 elif USE_AZURE:
+    # Azure settings
     AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME")
     AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
     AZURE_CONTAINER = env("AZURE_CONTAINER")
@@ -407,6 +427,7 @@ elif USE_AZURE:
     STATIC_URL = (
         f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/{STATIC_LOCATION}/"
     )
+    STATIC_FULL_URL = STATIC_URL
     STATICFILES_STORAGE = "bookwyrm.storage_backends.AzureStaticStorage"
     # Azure Media settings
     MEDIA_LOCATION = "images"
@@ -414,15 +435,24 @@ elif USE_AZURE:
         f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/{MEDIA_LOCATION}/"
     )
     MEDIA_FULL_URL = MEDIA_URL
-    STATIC_FULL_URL = STATIC_URL
     DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.AzureImagesStorage"
+    # Azure Exports settings
+    EXPORTS_STORAGE = None  # not implemented yet
+    # Content Security Policy
     CSP_DEFAULT_SRC = ["'self'", AZURE_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
     CSP_SCRIPT_SRC = ["'self'", AZURE_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
 else:
+    # Static settings
     STATIC_URL = "/static/"
+    STATIC_FULL_URL = BASE_URL + STATIC_URL
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+    # Media settings
     MEDIA_URL = "/images/"
-    MEDIA_FULL_URL = f"{PROTOCOL}://{DOMAIN}{MEDIA_URL}"
-    STATIC_FULL_URL = f"{PROTOCOL}://{DOMAIN}{STATIC_URL}"
+    MEDIA_FULL_URL = BASE_URL + MEDIA_URL
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    # Exports settings
+    EXPORTS_STORAGE = "bookwyrm.storage_backends.ExportsFileStorage"
+    # Content Security Policy
     CSP_DEFAULT_SRC = ["'self'"] + CSP_ADDITIONAL_HOSTS
     CSP_SCRIPT_SRC = ["'self'"] + CSP_ADDITIONAL_HOSTS
 
