@@ -1,20 +1,24 @@
 """ database schema for info about authors """
+
 import re
 from typing import Tuple, Any
 
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
 import pgtrigger
 
 from bookwyrm import activitypub
-from bookwyrm.settings import DOMAIN
+from bookwyrm.settings import BASE_URL
 from bookwyrm.utils.db import format_trigger
 
-from .book import BookDataModel
+from .book import BookDataModel, MergedAuthor
 from . import fields
 
 
 class Author(BookDataModel):
     """basic biographic info"""
+
+    merged_model = MergedAuthor
 
     wikipedia_link = fields.CharField(
         max_length=255, blank=True, null=True, deduplication_field=True
@@ -66,16 +70,34 @@ class Author(BookDataModel):
 
     def get_remote_id(self):
         """editions and works both use "book" instead of model_name"""
-        return f"https://{DOMAIN}/author/{self.id}"
+        return f"{BASE_URL}/author/{self.id}"
 
     class Meta:
         """sets up indexes and triggers"""
 
+        # pylint: disable=line-too-long
+
+        indexes = (GinIndex(fields=["search_vector"]),)
         triggers = [
             pgtrigger.Trigger(
-                name="reset_search_vector_on_author_edit",
+                name="update_search_vector_on_author_edit",
+                when=pgtrigger.Before,
+                operation=pgtrigger.Insert
+                | pgtrigger.UpdateOf("name", "aliases", "search_vector"),
+                func=format_trigger(
+                    """new.search_vector :=
+                    -- author name, with priority A
+                    setweight(to_tsvector('simple', new.name), 'A') ||
+                    -- author aliases, with priority B
+                    setweight(to_tsvector('simple', coalesce(array_to_string(new.aliases, ' '), '')), 'B');
+                    RETURN new;
+                """
+                ),
+            ),
+            pgtrigger.Trigger(
+                name="reset_book_search_vector_on_author_edit",
                 when=pgtrigger.After,
-                operation=pgtrigger.UpdateOf("name"),
+                operation=pgtrigger.UpdateOf("name", "aliases"),
                 func=format_trigger(
                     """WITH updated_books AS (
                          SELECT book_id
@@ -89,7 +111,7 @@ class Author(BookDataModel):
                     RETURN new;
                 """
                 ),
-            )
+            ),
         ]
 
     activity_serializer = activitypub.Author
