@@ -12,34 +12,58 @@ class BookSearch(TestCase):
     """look for some books"""
 
     @classmethod
-    def setUpTestData(self):  # pylint: disable=bad-classmethod-argument
+    def setUpTestData(cls):
         """we need basic test data and mocks"""
-        self.work = models.Work.objects.create(title="Example Work")
+        cls.first_author = models.Author.objects.create(
+            name="Author One", aliases=["The First"]
+        )
+        cls.second_author = models.Author.objects.create(
+            name="Author Two", aliases=["The Second"]
+        )
 
-        self.first_edition = models.Edition.objects.create(
+        cls.work = models.Work.objects.create(title="Example Work")
+
+        cls.first_edition = models.Edition.objects.create(
             title="Example Edition",
-            parent_work=self.work,
+            parent_work=cls.work,
             isbn_10="0000000000",
             physical_format="Paperback",
             published_date=datetime.datetime(2019, 4, 9, 0, 0, tzinfo=timezone.utc),
         )
-        self.second_edition = models.Edition.objects.create(
+        cls.first_edition.authors.add(cls.first_author)
+
+        cls.second_edition = models.Edition.objects.create(
             title="Another Edition",
-            parent_work=self.work,
+            parent_work=cls.work,
             isbn_10="1111111111",
             openlibrary_key="hello",
             pages=150,
         )
-        self.third_edition = models.Edition.objects.create(
+        cls.second_edition.authors.add(cls.first_author)
+        cls.second_edition.authors.add(cls.second_author)
+
+        cls.third_edition = models.Edition.objects.create(
             title="Another Edition with annoying ISBN",
-            parent_work=self.work,
+            parent_work=cls.work,
             isbn_10="022222222X",
         )
+        cls.third_edition.authors.add(cls.first_author)
+        cls.third_edition.authors.add(cls.second_author)
 
     def test_search(self):
         """search for a book in the db"""
-        # title/author
+        # title
         results = book_search.search("Example")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], self.first_edition)
+
+        # author
+        results = book_search.search("One")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], self.first_edition)
+
+        # author alias
+        results = book_search.search("First")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], self.first_edition)
 
@@ -155,8 +179,17 @@ class SearchVectorTest(TestCase):
         """search vector with subtitle and series"""
         # for a book like this we call `to_tsvector("Book Long Mary Bunch")`, hence the
         # indexes in the search vector. (priority "D" is the default, and never shown.)
-        book = self._create_book("Book", "Mary", subtitle="Long", series="Bunch")
-        self.assertEqual(book.search_vector, "'book':1A 'bunch':4 'long':2B 'mary':3C")
+        book = self._create_book(
+            "Book",
+            "Mary",
+            subtitle="Long",
+            series="Bunch",
+            author_alias=["Maria", "Mary Ann"],
+        )
+        self.assertEqual(
+            book.search_vector,
+            "'ann':6C 'book':1A 'bunch':7 'long':2B 'maria':4C 'mary':3C,5C",
+        )
 
     def test_search_vector_parse_book(self):
         """book parts are parsed in english"""
@@ -170,8 +203,8 @@ class SearchVectorTest(TestCase):
 
     def test_search_vector_parse_author(self):
         """author name is not stem'd or affected by stop words"""
-        book = self._create_book("Writing", "Writes")
-        self.assertEqual(book.search_vector, "'write':1A 'writes':2C")
+        book = self._create_book("Writing", "Writes", author_alias=["Reads"])
+        self.assertEqual(book.search_vector, "'reads':3C 'write':1A 'writes':2C")
 
         book = self._create_book("She Is Writing", "She Writes")
         self.assertEqual(book.search_vector, "'she':4C 'write':3A 'writes':5C")
@@ -217,6 +250,13 @@ class SearchVectorTest(TestCase):
         author.save(broadcast=False)
         book.refresh_from_db()
         self.assertEqual(book.search_vector, "'goodby':3A 'jeremy':4C 'long':2A")
+
+        author.aliases = ["Example"]
+        author.save(broadcast=False)
+        book.refresh_from_db()
+        self.assertEqual(
+            book.search_vector, "'example':5C 'goodby':3A 'jeremy':4C 'long':2A"
+        )
 
     def test_search_vector_on_author_delete(self):
         """update search when an author is deleted"""
@@ -274,7 +314,7 @@ class SearchVectorUpdates(TestCase):
     def setUp(self):
         """we need basic test data and mocks"""
         self.work = models.Work.objects.create(title="This Work")
-        self.author = models.Author.objects.create(name="Name")
+        self.author = models.Author.objects.create(name="Name", aliases=["Alias"])
         self.edition = models.Edition.objects.create(
             title="First Edition of Work",
             subtitle="Some Extra Words Are Good",
@@ -363,13 +403,18 @@ class SearchVectorUpdates(TestCase):
     def test_search_after_updated_author_name(self):
         """book found under new author name"""
         self.assertEqual(self.edition, self._search_first("Name"))
+        self.assertEqual(self.edition, self._search_first("Alias"))
         self.assertFalse(self._search("Identifier"))
+        self.assertFalse(self._search("Another"))
 
         self.author.name = "Identifier"
+        self.author.aliases = ["Another"]
         self.author.save(broadcast=False)
 
         self.assertFalse(self._search("Name"))
+        self.assertFalse(self._search("Aliases"))
         self.assertEqual(self.edition, self._search_first("Identifier"))
+        self.assertEqual(self.edition, self._search_first("Another"))
         self.assertEqual(self.edition, self._search_first("Work"))
 
     def _search_first(self, query):
