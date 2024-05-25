@@ -295,6 +295,9 @@ AUTH_USER_MODEL = "bookwyrm.User"
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        'OPTIONS': {
+            'max_similarity': .9,
+        }
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
