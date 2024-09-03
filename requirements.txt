@@ -4,7 +4,7 @@ boto3==1.26.57
 bw-file-resubmit==0.6.0rc2
 celery==5.3.1
 colorthief==0.2.1
-Django==3.2.25
+Django==4.2.15
 django-celery-beat==2.5.0
 django-compressor==4.4
 django-csp==3.7
@@ -37,10 +37,10 @@ python-dateutil==2.8.2
 pytz>=2022.7
 qrcode==7.3.1
 redis==4.5.4
-requests==2.32.0
+requests==2.32.2
 responses==0.22.0
 s3-tar==0.1.13
-setuptools>=65.5.1 # Not a direct dependency, pinned to get a security fix
+setuptools>=70.0.0 # Not a direct dependency, pinned to get a security fix
 tornado==6.3.3 # Not a direct dependency, pinned to get a security fix
 
 # Dev
@@ -65,3 +65,6 @@ types-python-dateutil==2.8.19.14
 types-requests==2.31.0.2
 
 
+jwcrypto>=1.5.6 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
