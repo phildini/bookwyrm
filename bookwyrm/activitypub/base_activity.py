@@ -250,7 +250,10 @@ class ActivityObject:
                 pass
         data = {k: v for (k, v) in data.items() if v is not None and k not in omit}
         if "@context" not in omit:
-            data["@context"] = "https://www.w3.org/ns/activitystreams"
+            data["@context"] = [
+                "https://www.w3.org/ns/activitystreams",
+                {"Hashtag": "as:Hashtag"},
+            ]
         return data
 
 
@@ -366,17 +369,13 @@ def resolve_remote_id(
 
     # load the data and create the object
     try:
-        data = get_data(remote_id)
+        data = get_activitypub_data(remote_id)
     except ConnectionError:
         logger.info("Could not connect to host for remote_id: %s", remote_id)
         return None
     except requests.HTTPError as e:
-        if (e.response is not None) and e.response.status_code == 401:
-            # This most likely means it's a mastodon with secure fetch enabled.
-            data = get_activitypub_data(remote_id)
-        else:
-            logger.info("Could not connect to host for remote_id: %s", remote_id)
-            return None
+        logger.exception("HTTP error - remote_id: %s - error: %s", remote_id, e)
+        return None
     # determine the model implicitly, if not provided
     # or if it's a model with subclasses like Status, check again
     if not model or hasattr(model.objects, "select_subclasses"):
@@ -400,11 +399,11 @@ def get_representative():
     to sign outgoing HTTP GET requests"""
     return models.User.objects.get_or_create(
         username=f"{INSTANCE_ACTOR_USERNAME}@{DOMAIN}",
-        defaults=dict(
-            email="bookwyrm@localhost",
-            local=True,
-            localname=INSTANCE_ACTOR_USERNAME,
-        ),
+        defaults={
+            "email": "bookwyrm@localhost",
+            "local": True,
+            "localname": INSTANCE_ACTOR_USERNAME,
+        },
     )[0]
 
 

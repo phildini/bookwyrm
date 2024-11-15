@@ -52,7 +52,6 @@ class PartialDate(datetime):
         Use subclasses to specify precision. If `dt` is naive, `ValueError`
         is raised.
         """
-        # pylint: disable=invalid-name
         if timezone.is_naive(dt):
             raise ValueError("naive datetime not accepted")
         return cls.combine(dt.date(), dt.time(), tzinfo=dt.tzinfo)
@@ -222,17 +221,17 @@ class PartialDateDescriptor:
         return [("DAY", "Day prec."), ("MONTH", "Month prec."), ("YEAR", "Year prec.")]
 
 
-class PartialDateModel(models.DateTimeField):  # type: ignore
+class PartialDateModel(models.DateTimeField):  # type: ignore[type-arg]
     """a date field for Django models, using PartialDate as values"""
 
     descriptor_class = PartialDateDescriptor
 
-    def formfield(self, **kwargs):  # type: ignore
+    def formfield(self, **kwargs):  # type: ignore[no-untyped-def]
         kwargs.setdefault("form_class", PartialDateFormField)
         return super().formfield(**kwargs)
 
-    # pylint: disable-next=arguments-renamed
-    def contribute_to_class(self, model, our_name_in_model, **kwargs):  # type: ignore
+    # pylint: disable-next=arguments-renamed,line-too-long
+    def contribute_to_class(self, model, our_name_in_model, **kwargs):  # type: ignore[no-untyped-def]
         # Define precision field.
         descriptor = self.descriptor_class(self)
         precision: models.Field[Optional[str], Optional[str]] = models.CharField(

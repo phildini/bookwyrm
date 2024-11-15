@@ -3,7 +3,6 @@ from collections import namedtuple
 import pathlib
 from unittest.mock import patch
 import datetime
-import pytz
 
 from django.test import TestCase
 import responses
@@ -16,7 +15,7 @@ from bookwyrm.models.import_job import handle_imported_book
 
 def make_date(*args):
     """helper function to easily generate a date obj"""
-    return datetime.datetime(*args, tzinfo=pytz.UTC)
+    return datetime.datetime(*args, tzinfo=datetime.timezone.utc)
 
 
 @patch("bookwyrm.suggested_users.rerank_suggestions_task.delay")
@@ -64,7 +63,9 @@ class GenericImporter(TestCase):
         self.assertEqual(import_job.include_reviews, False)
         self.assertEqual(import_job.privacy, "public")
 
-        import_items = models.ImportItem.objects.filter(job=import_job).all()
+        import_items = (
+            models.ImportItem.objects.filter(job=import_job).all().order_by("id")
+        )
         self.assertEqual(len(import_items), 4)
         self.assertEqual(import_items[0].index, 0)
         self.assertEqual(import_items[0].normalized_data["id"], "38")
