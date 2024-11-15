@@ -7,12 +7,11 @@ from boto3.session import Session as BotoSession
 from s3_tar import S3Tar
 
 from django.db.models import BooleanField, FileField, JSONField
-from django.db.models import Q
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.files.base import ContentFile
-from django.utils.module_loading import import_string
+from django.core.files.storage import storages
 
-from bookwyrm import settings, storage_backends
+from bookwyrm import settings
 
 from bookwyrm.models import AnnualGoal, ReadThrough, ShelfBook, ListItem
 from bookwyrm.models import Review, Comment, Quotation
@@ -28,15 +27,14 @@ logger = logging.getLogger(__name__)
 class BookwyrmAwsSession(BotoSession):
     """a boto session that always uses settings.AWS_S3_ENDPOINT_URL"""
 
-    def client(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def client(self, *args, **kwargs):
         kwargs["endpoint_url"] = settings.AWS_S3_ENDPOINT_URL
         return super().client("s3", *args, **kwargs)
 
 
 def select_exports_storage():
     """callable to allow for dependency on runtime configuration"""
-    cls = import_string(settings.EXPORTS_STORAGE)
-    return cls()
+    return storages["exports"]
 
 
 class BookwyrmExportJob(ParentJob):
@@ -116,7 +114,7 @@ def create_archive_task(job_id):
 
         if settings.USE_S3:
             # Storage for writing temporary files
-            exports_storage = storage_backends.ExportsS3Storage()
+            exports_storage = storages["exports"]
 
             # Handle for creating the final archive
             s3_tar = S3Tar(
@@ -136,7 +134,7 @@ def create_archive_task(job_id):
             )
 
             # Add images to TAR
-            images_storage = storage_backends.ImagesStorage()
+            images_storage = storages["default"]
 
             if user.avatar:
                 add_file_to_s3_tar(s3_tar, images_storage, user.avatar)
@@ -316,19 +314,28 @@ def export_book(user: User, edition: Edition):
 
 
 def get_books_for_user(user):
-    """Get all the books and editions related to a user"""
+    """
+    Get all the books and editions related to a user.
 
-    editions = (
-        Edition.objects.select_related("parent_work")
-        .filter(
-            Q(shelves__user=user)
-            | Q(readthrough__user=user)
-            | Q(review__user=user)
-            | Q(list__user=user)
-            | Q(comment__user=user)
-            | Q(quotation__user=user)
-        )
-        .distinct()
+    We use union() instead of Q objects because it creates
+    multiple simple queries in stead of a much more complex DB query
+    that can time out.
+
+    """
+
+    shelf_eds = Edition.objects.select_related("parent_work").filter(shelves__user=user)
+    rt_eds = Edition.objects.select_related("parent_work").filter(
+        readthrough__user=user
     )
+    review_eds = Edition.objects.select_related("parent_work").filter(review__user=user)
+    list_eds = Edition.objects.select_related("parent_work").filter(list__user=user)
+    comment_eds = Edition.objects.select_related("parent_work").filter(
+        comment__user=user
+    )
+    quote_eds = Edition.objects.select_related("parent_work").filter(
+        quotation__user=user
+    )
+
+    editions = shelf_eds.union(rt_eds, review_eds, list_eds, comment_eds, quote_eds)
 
     return editions
