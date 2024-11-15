@@ -17,7 +17,6 @@ django-storages==1.14.2
 django-storages[azure]
 environs==11.0.0
 flower==2.0.1
-pytz>=2022.7
 hiredis==2.3.2
 libsass==0.23.0
 Markdown==3.6
@@ -29,21 +28,25 @@ opentelemetry-instrumentation-psycopg2==0.45b0
 opentelemetry-sdk==1.24.0
 Pillow==10.3.0
 pilkit>=3.0 # dependency of django-imagekit, 2.0 is incompatible with Pillow>=10
+protobuf==3.20.*
 psycopg2==2.9.9
 pycryptodome==3.20.0
 pyotp==2.9.0
 python-dateutil==2.9.0.post0
+pytz>=2022.7
 qrcode==7.4.2
 redis==5.0.3
-requests==2.32.0
+requests==2.32.2
 responses==0.25.0
 s3-tar==0.1.13
 sqlparse==0.5.1
 
 # Indirect dependencies with version constraints for security fixes
 grpcio>=1.57.0
-setuptools>=70.0.0
+jwcrypto>=1.5.6
+setuptools>=70.0.0 
 tornado>=6.3.3
+urllib3>=2.2.2
 zipp>=3.19.1 
 
 # Dev
@@ -65,5 +68,3 @@ types-Pillow==10.2.0.20240331
 types-psycopg2==2.9.21.20240311
 types-python-dateutil==2.9.0.20240316
 types-requests==2.31.0.20240311
-urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
-zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
