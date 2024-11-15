@@ -42,8 +42,9 @@ sqlparse==0.5.1
 
 # Indirect dependencies with version constraints for security fixes
 grpcio>=1.57.0
-setuptools>=65.5.1
+setuptools>=70.0.0
 tornado>=6.3.3
+zipp>=3.19.1 
 
 # Dev
 black==22.*
