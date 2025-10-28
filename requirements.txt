@@ -33,6 +33,7 @@ psycopg[binary]==3.2.9
 pycryptodome==3.20.0
 pyotp==2.9.0
 python-dateutil==2.9.0.post0
+pytz>=2022.7
 qrcode==7.4.2
 redis==5.0.3
 requests==2.32.4
@@ -43,8 +44,11 @@ ua-parser[regex]==1.0.1
 
 # Indirect dependencies with version constraints for security fixes
 grpcio>=1.57.0
-setuptools>=65.5.1
+jwcrypto>=1.5.6
+setuptools>=70.0.0 
 tornado>=6.3.3
+urllib3>=2.2.2
+zipp>=3.19.1
 
 # Dev
 black==22.*
