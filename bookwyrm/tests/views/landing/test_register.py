@@ -60,7 +60,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria-user.user_nutria",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa@bb.cccc",
                 "preferred_timezone": "Europe/Berlin",
             },
@@ -87,7 +87,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa@bb.cccc",
             },
         )
@@ -154,7 +154,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "",
                 "invite_code": "testcode",
             },
@@ -213,7 +213,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria1",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa1@bb.cccc",
                 "preferred_timezone": "invalid-tz",
             },
@@ -229,7 +229,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria2",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa2@bb.cccc",
                 "preferred_timezone": "",
             },
@@ -245,7 +245,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria3",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa3@bb.cccc",
             },
         )
@@ -306,7 +306,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa@bb.ccc",
                 "invite_code": "testcode",
             },
@@ -322,7 +322,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria2",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa@bb.ccc",
                 "invite_code": "testcode",
             },
@@ -336,7 +336,7 @@ class RegisterViews(TestCase):
             "register/",
             {
                 "localname": "nutria3",
-                "password": "mouseword",
+                "password": "mouseword-password-123",
                 "email": "aa@bb.ccc",
                 "invite_code": "dkfkdjgdfkjgkdfj",
             },

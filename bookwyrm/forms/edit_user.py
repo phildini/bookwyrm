@@ -112,7 +112,7 @@ class ChangePasswordForm(CustomForm):
             self.add_error("confirm_password", _("Password does not match"))
 
         try:
-            validate_password(new_password)
+            validate_password(new_password, user=self.instance)
         except ValidationError as err:
             self.add_error("password", err)
 

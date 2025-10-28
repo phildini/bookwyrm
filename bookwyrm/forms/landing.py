@@ -48,8 +48,15 @@ class RegisterForm(CustomForm):
         """Check if the username is taken"""
         cleaned_data = super().clean()
         localname = cleaned_data.get("localname").strip()
+
+        # Create a temporary user instance for password validation
+        temp_user = self._meta.model(
+            localname=localname,
+            email=cleaned_data.get("email")
+        )
+
         try:
-            validate_password(cleaned_data.get("password"))
+            validate_password(cleaned_data.get("password"), user=temp_user)
         except ValidationError as err:
             self.add_error("password", err)
         if models.User.objects.filter(localname=localname).first():
@@ -93,7 +100,7 @@ class PasswordResetForm(CustomForm):
             self.add_error("confirm_password", _("Password does not match"))
 
         try:
-            validate_password(new_password)
+            validate_password(new_password, user=self.instance)
         except ValidationError as err:
             self.add_error("password", err)
 

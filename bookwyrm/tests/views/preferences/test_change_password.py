@@ -52,8 +52,8 @@ class ChangePasswordViews(TestCase):
             "",
             {
                 "current_password": "password",
-                "password": "longwordsecure",
-                "confirm_password": "longwordsecure",
+                "password": "longwordsecure1234",
+                "confirm_password": "longwordsecure1234",
             },
         )
         request.user = self.local_user
@@ -71,7 +71,7 @@ class ChangePasswordViews(TestCase):
             "",
             {
                 "current_password": "not my password",
-                "password": "longwordsecure",
+                "password": "longwordsecure1234",
                 "confirm_password": "hihi",
             },
         )
@@ -89,7 +89,7 @@ class ChangePasswordViews(TestCase):
             "",
             {
                 "current_password": "password",
-                "password": "longwordsecure",
+                "password": "longwordsecure1234",
                 "confirm_password": "hihi",
             },
         )

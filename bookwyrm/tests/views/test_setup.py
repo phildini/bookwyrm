@@ -66,7 +66,7 @@ class SetupViews(TestCase):
 
         form = forms.RegisterForm()
         form.data["localname"] = "mouse"
-        form.data["password"] = "mouseword"
+        form.data["password"] = "mouseword-password-123"
         form.data["email"] = "aaa@bbb.ccc"
         request = self.factory.post("", form.data)
 

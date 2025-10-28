@@ -111,7 +111,7 @@ class PasswordViews(TestCase):
         view = views.PasswordReset.as_view()
         code = models.PasswordReset.objects.create(user=self.local_user)
         request = self.factory.post(
-            "", {"password": "longwordsecure", "confirm_password": "longwordsecure"}
+            "", {"password": "longwordsecure1234", "confirm_password": "longwordsecure1234"}
         )
         with patch("bookwyrm.views.landing.password.login"):
             resp = view(request, code.code)
@@ -123,7 +123,7 @@ class PasswordViews(TestCase):
         view = views.PasswordReset.as_view()
         models.PasswordReset.objects.create(user=self.local_user)
         request = self.factory.post(
-            "", {"password": "longwordsecure", "confirm_password": "longwordsecure"}
+            "", {"password": "longwordsecure1234", "confirm_password": "longwordsecure1234"}
         )
         resp = view(request, "jhgdkfjgdf")
         validate_html(resp.render())
@@ -134,7 +134,7 @@ class PasswordViews(TestCase):
         view = views.PasswordReset.as_view()
         code = models.PasswordReset.objects.create(user=self.local_user)
         request = self.factory.post(
-            "", {"password": "longwordsecure", "confirm_password": "hihi"}
+            "", {"password": "longwordsecure1234", "confirm_password": "hihi"}
         )
         resp = view(request, code.code)
         validate_html(resp.render())
