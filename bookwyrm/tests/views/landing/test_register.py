@@ -107,7 +107,7 @@ class RegisterViews(TestCase):
         view = views.Register.as_view()
         request = self.factory.post(
             "register/",
-            {"localname": "nutria ", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "nutria ", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         with patch("bookwyrm.views.landing.register.login"):
             response = view(request)
@@ -123,7 +123,7 @@ class RegisterViews(TestCase):
         view = views.Register.as_view()
         self.assertEqual(models.User.objects.count(), 1)
         request = self.factory.post(
-            "register/", {"localname": "nutria", "password": "mouseword", "email": "aa"}
+            "register/", {"localname": "nutria", "password": "mouseword-password-123", "email": "aa"}
         )
         response = view(request)
         self.assertEqual(models.User.objects.count(), 1)
@@ -170,7 +170,7 @@ class RegisterViews(TestCase):
         self.assertEqual(models.User.objects.count(), 1)
         request = self.factory.post(
             "register/",
-            {"localname": "mouse", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "mouse", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         response = view(request)
         self.assertEqual(models.User.objects.count(), 1)
@@ -182,7 +182,7 @@ class RegisterViews(TestCase):
         self.assertEqual(models.User.objects.count(), 1)
         request = self.factory.post(
             "register/",
-            {"localname": "nut@ria", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "nut@ria", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         response = view(request)
         self.assertEqual(models.User.objects.count(), 1)
@@ -190,7 +190,7 @@ class RegisterViews(TestCase):
 
         request = self.factory.post(
             "register/",
-            {"localname": "nutr ia", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "nutr ia", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         response = view(request)
         self.assertEqual(models.User.objects.count(), 1)
@@ -198,7 +198,7 @@ class RegisterViews(TestCase):
 
         request = self.factory.post(
             "register/",
-            {"localname": "nut@ria", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "nut@ria", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         response = view(request)
         self.assertEqual(models.User.objects.count(), 1)
@@ -263,7 +263,7 @@ class RegisterViews(TestCase):
         self.settings.save()
         request = self.factory.post(
             "register/",
-            {"localname": "nutria ", "password": "mouseword", "email": "aa@bb.ccc"},
+            {"localname": "nutria ", "password": "mouseword-password-123", "email": "aa@bb.ccc"},
         )
         with self.assertRaises(PermissionDenied):
             view(request)
@@ -276,7 +276,7 @@ class RegisterViews(TestCase):
         # one that fails
         request = self.factory.post(
             "register/",
-            {"localname": "nutria ", "password": "mouseword", "email": "aa@gmail.com"},
+            {"localname": "nutria ", "password": "mouseword-password-123", "email": "aa@gmail.com"},
         )
         result = view(request)
         self.assertEqual(result.status_code, 302)
@@ -285,7 +285,7 @@ class RegisterViews(TestCase):
         # one that succeeds
         request = self.factory.post(
             "register/",
-            {"localname": "nutria ", "password": "mouseword", "email": "aa@bleep.com"},
+            {"localname": "nutria ", "password": "mouseword-password-123", "email": "aa@bleep.com"},
         )
         with patch("bookwyrm.views.landing.register.login"):
             result = view(request)
