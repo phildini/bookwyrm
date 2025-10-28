@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13
+        image: postgres:17
         env: # does not inherit from jobs.build.env
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: hunter2
@@ -48,7 +48,7 @@ jobs:
     - name: Set up .env
       run: cp .env.example .env
     - name: Check migrations up-to-date
-      run: python ./manage.py makemigrations --check
+      run: python ./manage.py makemigrations --check -v 3
     - name: Run Tests
       run: pytest -n 3
 

@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 PropertyField = namedtuple("PropertyField", ("set_activity_from_field"))
 
-# pylint: disable=invalid-name
+
 def set_activity_from_property_field(activity, obj, field):
     """assign a model property value to the activity json"""
     activity[field[1]] = getattr(obj, field[0])
@@ -129,7 +129,20 @@ class ActivitypubMixin:
 
     def broadcast(self, activity, sender, software=None, queue=BROADCAST):
         """send out an activity"""
+
+        # if we're posting about ShelfBooks, set a delay to give the base activity
+        # time to add the book on remote servers first to avoid race conditions
+        countdown = (
+            10
+            if (
+                isinstance(activity, object)
+                and not isinstance(activity["object"], str)
+                and activity["object"].get("type", None) in ["GeneratedNote", "Comment"]
+            )
+            else 0
+        )
         broadcast_task.apply_async(
+            countdown=countdown,
             args=(
                 sender.id,
                 json.dumps(activity, cls=activitypub.ActivityEncoder),
@@ -169,7 +182,7 @@ class ActivitypubMixin:
             # filter users first by whether they're using the desired software
             # this lets us send book updates only to other bw servers
             if software:
-                queryset = queryset.filter(bookwyrm_user=(software == "bookwyrm"))
+                queryset = queryset.filter(bookwyrm_user=software == "bookwyrm")
             # if there's a user, we only want to send to the user's followers
             if user:
                 queryset = queryset.filter(following=user)
@@ -206,14 +219,10 @@ class ObjectMixin(ActivitypubMixin):
         created: Optional[bool] = None,
         software: Any = None,
         priority: str = BROADCAST,
+        broadcast: bool = True,
         **kwargs: Any,
     ) -> None:
         """broadcast created/updated/deleted objects as appropriate"""
-        broadcast = kwargs.get("broadcast", True)
-        # this bonus kwarg would cause an error in the base save method
-        if "broadcast" in kwargs:
-            del kwargs["broadcast"]
-
         created = created or not bool(self.id)
         # first off, we want to save normally no matter what
         super().save(*args, **kwargs)
@@ -231,6 +240,7 @@ class ObjectMixin(ActivitypubMixin):
                 return
 
             try:
+                # TODO: here is where we might use an ActivityPub extension instead
                 # do we have a "pure" activitypub version of this for mastodon?
                 if software != "bookwyrm" and hasattr(self, "pure_content"):
                     pure_activity = self.to_create_activity(user, pure=True)

@@ -3,7 +3,6 @@
 
 let BookWyrm = new (class {
     constructor() {
-        this.MAX_FILE_SIZE_BYTES = 10 * 1000000;
         this.initOnDOMLoaded();
         this.initRecurringTasks();
         this.initEventListeners();
@@ -13,6 +12,10 @@ let BookWyrm = new (class {
         document
             .querySelectorAll("[data-controls]")
             .forEach((button) => button.addEventListener("click", this.toggleAction.bind(this)));
+
+        document
+            .querySelectorAll("[data-disappear]")
+            .forEach((button) => button.addEventListener("click", this.hideSelf.bind(this)));
 
         document
             .querySelectorAll(".interaction")
@@ -179,6 +182,18 @@ let BookWyrm = new (class {
         let visible = document.getElementById(targetId);
 
         this.addRemoveClass(visible, "is-hidden", true);
+    }
+
+    /**
+     * Hide the element you just clicked
+     *
+     * @param {Event} event
+     * @return {undefined}
+     */
+    hideSelf(event) {
+        let trigger = event.currentTarget;
+
+        this.addRemoveClass(trigger, "is-hidden", true);
     }
 
     /**
@@ -380,13 +395,14 @@ let BookWyrm = new (class {
     }
 
     disableIfTooLarge(eventOrElement) {
-        const { addRemoveClass, MAX_FILE_SIZE_BYTES } = this;
+        const { addRemoveClass } = this;
         const element = eventOrElement.currentTarget || eventOrElement;
+        const limit = element.dataset.maxUpload;
 
         const submits = element.form.querySelectorAll('[type="submit"]');
         const warns = element.parentElement.querySelectorAll(".file-too-big");
         const isTooBig =
-            element.files && element.files[0] && element.files[0].size > MAX_FILE_SIZE_BYTES;
+            element.files && limit && element.files[0] && element.files[0].size > limit;
 
         if (isTooBig) {
             submits.forEach((submitter) => (submitter.disabled = true));

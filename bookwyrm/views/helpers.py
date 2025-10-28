@@ -156,8 +156,7 @@ def handle_reading_status(user, shelf, book, privacy):
         # it's a non-standard shelf, don't worry about it
         return
 
-    status = create_generated_note(user, message, mention_books=[book], privacy=privacy)
-    status.save()
+    create_generated_note(user, message, mention_books=[book], privacy=privacy)
 
 
 def load_date_in_user_tz_as_utc(date_str: str, user: models.User) -> datetime:
@@ -231,7 +230,7 @@ def maybe_redirect_local_path(request, model):
 def redirect_to_referer(request, *args, **kwargs):
     """Redirect to the referrer, if it's in our domain, with get params"""
     # make sure the refer is part of this instance
-    validated = validate_url_domain(request.META.get("HTTP_REFERER"))
+    validated = validate_url_domain(request.headers.get("referer", ""))
 
     if validated:
         return redirect(validated)
@@ -240,7 +239,7 @@ def redirect_to_referer(request, *args, **kwargs):
     return redirect(*args or "/", **kwargs)
 
 
-# pylint: disable=redefined-builtin,invalid-name
+# pylint: disable=redefined-builtin
 def get_mergeable_object_or_404(klass, id):
     """variant of get_object_or_404 that also redirects if id has been merged
     into another object"""

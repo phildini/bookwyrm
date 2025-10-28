@@ -116,7 +116,7 @@ def get_isni(existing, author, autoescape=True):
 
 
 @register.simple_tag(takes_context=False)
-def id_to_username(user_id):
+def id_to_username(user_id, return_empty=False):
     """given an arbitrary remote id, return the username"""
     if user_id:
         url = urlparse(user_id)
@@ -126,6 +126,10 @@ def id_to_username(user_id):
         value = f"{name}@{domain}"
 
         return value
+
+    if return_empty:
+        return ""
+
     return _("a new user account")
 
 
@@ -137,14 +141,14 @@ def get_file_size(nbytes):
         raw_size = float(nbytes)
     except (ValueError, TypeError):
         return repr(nbytes)
-    else:
-        if raw_size < 1024:
-            return f"{raw_size} bytes"
-        if raw_size < 1024**2:
-            return f"{raw_size/1024:.2f} KB"
-        if raw_size < 1024**3:
-            return f"{raw_size/1024**2:.2f} MB"
-        return f"{raw_size/1024**3:.2f} GB"
+
+    if raw_size < 1024:
+        return f"{raw_size} bytes"
+    if raw_size < 1024**2:
+        return f"{raw_size/1024:.2f} KB"
+    if raw_size < 1024**3:
+        return f"{raw_size/1024**2:.2f} MB"
+    return f"{raw_size/1024**3:.2f} GB"
 
 
 @register.filter(name="get_user_permission")

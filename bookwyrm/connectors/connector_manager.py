@@ -145,7 +145,9 @@ def load_more_data(connector_id: str, book_id: str) -> None:
     """background the work of getting all 10,000 editions of LoTR"""
     connector_info = models.Connector.objects.get(id=connector_id)
     connector = load_connector(connector_info)
-    book = models.Book.objects.select_subclasses().get(id=book_id)
+    book = models.Book.objects.select_subclasses().get(  # type: ignore[no-untyped-call]
+        id=book_id
+    )
     connector.expand_book_data(book)
 
 
@@ -156,7 +158,9 @@ def create_edition_task(
     """separate task for each of the 10,000 editions of LoTR"""
     connector_info = models.Connector.objects.get(id=connector_id)
     connector = load_connector(connector_info)
-    work = models.Work.objects.select_subclasses().get(id=work_id)
+    work = models.Work.objects.select_subclasses().get(  # type: ignore[no-untyped-call]
+        id=work_id
+    )
     connector.create_edition_from_data(work, data)
 
 
@@ -202,3 +206,26 @@ def raise_not_valid_url(url: str) -> None:
 
     if models.FederatedServer.is_blocked(url):
         raise ConnectorException(f"Attempting to load data from blocked url: {url}")
+
+
+def create_finna_connector() -> None:
+    """create a Finna connector"""
+
+    models.Connector.objects.create(
+        identifier="api.finna.fi",
+        name="Finna API",
+        connector_file="finna",
+        base_url="https://www.finna.fi",
+        books_url="https://api.finna.fi/api/v1/record" "?id=",
+        covers_url="https://api.finna.fi",
+        search_url="https://api.finna.fi/api/v1/search?limit=20"
+        "&filter[]=format%3a%220%2fBook%2f%22"
+        "&field[]=title&field[]=recordPage&field[]=authors"
+        "&field[]=year&field[]=id&field[]=formats&field[]=images"
+        "&lookfor=",
+        isbn_search_url="https://api.finna.fi/api/v1/search?limit=1"
+        "&filter[]=format%3a%220%2fBook%2f%22"
+        "&field[]=title&field[]=recordPage&field[]=authors&field[]=year"
+        "&field[]=id&field[]=formats&field[]=images"
+        "&lookfor=isbn:",
+    )

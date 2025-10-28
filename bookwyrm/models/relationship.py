@@ -38,13 +38,15 @@ class UserRelationship(BookWyrmModel):
 
     def save(self, *args, **kwargs):
         """clear the template cache"""
-        clear_cache(self.user_subject, self.user_object)
         super().save(*args, **kwargs)
+
+        clear_cache(self.user_subject, self.user_object)
 
     def delete(self, *args, **kwargs):
         """clear the template cache"""
-        clear_cache(self.user_subject, self.user_object)
         super().delete(*args, **kwargs)
+
+        clear_cache(self.user_subject, self.user_object)
 
     class Meta:
         """relationships should be unique"""
@@ -55,7 +57,7 @@ class UserRelationship(BookWyrmModel):
                 fields=["user_subject", "user_object"], name="%(class)s_unique"
             ),
             models.CheckConstraint(
-                check=~models.Q(user_subject=models.F("user_object")),
+                condition=~models.Q(user_subject=models.F("user_object")),
                 name="%(class)s_no_self",
             ),
         ]
@@ -133,7 +135,7 @@ class UserFollowRequest(ActivitypubMixin, UserRelationship):
     status = "follow_request"
     activity_serializer = activitypub.Follow
 
-    def save(self, *args, broadcast=True, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, broadcast=True, **kwargs):
         """make sure the follow or block relationship doesn't already exist"""
         # if there's a request for a follow that already exists, accept it
         # without changing the local database state
