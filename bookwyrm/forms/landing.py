@@ -50,10 +50,7 @@ class RegisterForm(CustomForm):
         localname = cleaned_data.get("localname").strip()
 
         # Create a temporary user instance for password validation
-        temp_user = self._meta.model(
-            localname=localname,
-            email=cleaned_data.get("email")
-        )
+        temp_user = self._meta.model(localname=localname, email=cleaned_data.get("email"))
 
         try:
             validate_password(cleaned_data.get("password"), user=temp_user)
