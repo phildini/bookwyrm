@@ -75,7 +75,8 @@ class PasswordReset(View):
             return TemplateResponse(request, "landing/password_reset.html", data)
 
         new_password = form.cleaned_data["password"]
-        # deepcode ignore DjangoUnvalidatedPassword: cleaned_data validates the password; would be nice to move validation here eventually
+        # deepcode ignore DjangoUnvalidatedPassword: cleaned_data validates the
+        # password; would be nice to move validation here eventually
         user.set_password(new_password)
         user.save(broadcast=False, update_fields=["password"])
         login(request, user)

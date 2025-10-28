@@ -31,7 +31,8 @@ class ChangePassword(View):
             return TemplateResponse(request, "preferences/change_password.html", data)
 
         new_password = form.cleaned_data["password"]
-        # deepcode ignore DjangoUnvalidatedPassword: cleaned_data includes password validation; would be nice to move it here eventually
+        # deepcode ignore DjangoUnvalidatedPassword: cleaned_data includes password
+        # validation; would be nice to move it here eventually
         request.user.set_password(new_password)
         request.user.save(broadcast=False, update_fields=["password"])
 
