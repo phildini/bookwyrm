@@ -21,7 +21,6 @@ def fix_series(apps, schema_editor):
         works = Work.objects.filter(series__startswith="[")
         for work in works:
             if edition := work.editions.order_by("-edition_rank").first():
-                print("edition", edition)
                 try:
                     series = json.loads(work.series)
                     work.series = series
